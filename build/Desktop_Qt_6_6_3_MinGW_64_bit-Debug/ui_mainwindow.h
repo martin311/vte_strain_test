@@ -33,6 +33,7 @@ public:
     QChartView *chartView;
     QLabel *labelMin;
     QLabel *labelMax;
+    QPushButton *btnRefresh;
     QMenuBar *menubar;
 
     void setupUi(QMainWindow *MainWindow)
@@ -52,18 +53,13 @@ public:
         btnClose->setGeometry(QRect(30, 110, 80, 23));
         btnClear = new QPushButton(centralwidget);
         btnClear->setObjectName("btnClear");
-        btnClear->setGeometry(QRect(30, 150, 80, 23));
+        btnClear->setGeometry(QRect(250, 510, 80, 23));
         comboBoxPort = new QComboBox(centralwidget);
-        comboBoxPort->addItem(QString());
-        comboBoxPort->addItem(QString());
-        comboBoxPort->addItem(QString());
-        comboBoxPort->addItem(QString());
-        comboBoxPort->addItem(QString());
         comboBoxPort->setObjectName("comboBoxPort");
-        comboBoxPort->setGeometry(QRect(30, 230, 72, 23));
+        comboBoxPort->setGeometry(QRect(30, 260, 72, 23));
         label = new QLabel(centralwidget);
         label->setObjectName("label");
-        label->setGeometry(QRect(30, 200, 71, 21));
+        label->setGeometry(QRect(40, 230, 51, 21));
         chartView = new QChartView(centralwidget);
         chartView->setObjectName("chartView");
         chartView->setGeometry(QRect(200, 70, 431, 281));
@@ -73,6 +69,9 @@ public:
         labelMax = new QLabel(centralwidget);
         labelMax->setObjectName("labelMax");
         labelMax->setGeometry(QRect(250, 470, 81, 16));
+        btnRefresh = new QPushButton(centralwidget);
+        btnRefresh->setObjectName("btnRefresh");
+        btnRefresh->setGeometry(QRect(30, 190, 71, 31));
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
@@ -90,15 +89,10 @@ public:
         btnOpen->setText(QCoreApplication::translate("MainWindow", "\346\211\223\345\274\200\344\270\262\345\217\243", nullptr));
         btnClose->setText(QCoreApplication::translate("MainWindow", "\345\205\263\351\227\255\344\270\262\345\217\243", nullptr));
         btnClear->setText(QCoreApplication::translate("MainWindow", "\346\270\205\351\231\244\346\225\260\346\215\256", nullptr));
-        comboBoxPort->setItemText(0, QCoreApplication::translate("MainWindow", "COM1", nullptr));
-        comboBoxPort->setItemText(1, QCoreApplication::translate("MainWindow", "COM2", nullptr));
-        comboBoxPort->setItemText(2, QCoreApplication::translate("MainWindow", "COM3", nullptr));
-        comboBoxPort->setItemText(3, QCoreApplication::translate("MainWindow", "COM4", nullptr));
-        comboBoxPort->setItemText(4, QCoreApplication::translate("MainWindow", "COM5", nullptr));
-
-        label->setText(QCoreApplication::translate("MainWindow", "\351\200\211\346\213\251\344\270\262\345\217\243\345\217\267", nullptr));
+        label->setText(QCoreApplication::translate("MainWindow", "\351\200\211\346\213\251\347\253\257\345\217\243", nullptr));
         labelMin->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
         labelMax->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
+        btnRefresh->setText(QCoreApplication::translate("MainWindow", "\345\210\267\346\226\260\344\270\262\345\217\243", nullptr));
     } // retranslateUi
 
 };

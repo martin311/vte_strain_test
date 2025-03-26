@@ -13,20 +13,24 @@ MainWindow::MainWindow(QWidget *parent)
     , chart(new QChart())
     , axisX(new QValueAxis())
     , axisY(new QValueAxis())
+    , minStrain(1e9)  // 初始化为极大值
+    , maxStrain(-1e9)  // 初始化为极小值
     // , statusbar()
 {
     ui->setupUi(this);
+    refreshSerialPorts();
     // 配置串口
-    serial->setBaudRate(115200);
-    serial->setDataBits(QSerialPort::Data8);
-    serial->setParity(QSerialPort::NoParity);
-    serial->setStopBits(QSerialPort::OneStop);
+    currentBaudRate = QSerialPort::Baud115200;
+    currentDataBits = QSerialPort::Data8;
+    currentParity = QSerialPort::NoParity;
+    currentStopBits = QSerialPort::OneStop;
 
     // 连接信号和槽
     connect(ui->btnOpen, &QPushButton::clicked, this, &MainWindow::openSerialPort);
     connect(ui->btnClose, &QPushButton::clicked, this, &MainWindow::closeSerialPort);
     connect(ui->btnClear, &QPushButton::clicked, this, &MainWindow::clearData);
     connect(serial, &QSerialPort::readyRead, this, &MainWindow::readSerialData);
+    connect(ui->btnRefresh, &QPushButton::clicked, this, &MainWindow::refreshSerialPorts);
 
     // 初始化图表
     chart->legend()->hide();
@@ -35,8 +39,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     // 配置 X 轴 (时间轴)
     axisX->setTitleText("Time (s)");
-    axisX->setLabelFormat("%d");
-    axisX->setRange(0, 1000);
+    axisX->setLabelFormat("%.1f");
+    axisX->setRange(0, 60);
     chart->addAxis(axisX, Qt::AlignBottom);
     series->attachAxis(axisX);
 
@@ -49,62 +53,111 @@ MainWindow::MainWindow(QWidget *parent)
 
     // 显示图表
     ui->chartView->setChart(chart);
+    ui->chartView->setRenderHint(QPainter::Antialiasing);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete series;
+    delete chart;
+    delete axisX;
+    delete axisY;
+}
+
+void MainWindow::refreshSerialPorts() {
+    ui->comboBoxPort->clear();  // 清空现有选项
+
+    // 获取所有可用串口
+    QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+
+    // 如果没有找到串口
+    if (ports.isEmpty()) {
+        ui->comboBoxPort->addItem("无可用串口");
+        ui->comboBoxPort->setEnabled(false);  // 禁用下拉框
+        ui->btnOpen->setEnabled(false);       // 禁用打开按钮
+        qDebug() << "未检测到任何串口设备！";
+        return;
+    }
+
+    // 添加检测到的串口到下拉框
+    foreach (const QSerialPortInfo &port, ports) {
+        ui->comboBoxPort->addItem(port.portName());
+    }
+
+    qDebug() << "检测到串口：" << ui->comboBoxPort->count() << "个";
 }
 
 void MainWindow::openSerialPort()
 {
-    serial->setPortName(ui->comboBoxPort->currentText());
-    // if (serial->open(QIODevice::ReadOnly)) {
-    //     ui->statusbar->showMessage("串口打开成功");
-    // } else {
-    //     ui->statusbar->showMessage("串口打开失败");
-    // }
+    QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+    foreach (const QSerialPortInfo &port, ports) {
+        qDebug() << "Found port:" << port.portName();
+    }
+    QString portName = ui->comboBoxPort->currentText(); // 确保获取的是正确的串口号（如 "COM3"）
+    serial->setPortName(portName);
+    serial->setBaudRate(currentBaudRate);
+    serial->setDataBits(currentDataBits);
+    serial->setParity(currentParity);
+    serial->setStopBits(currentStopBits);
+
+    if (serial->open(QIODevice::ReadOnly)) {
+        statusBar()->showMessage("串口打开成功");  // 使用 statusBar() 方法
+    } else {
+        statusBar()->showMessage("串口打开失败: " + serial->errorString());
+    }
 }
 
 void MainWindow::closeSerialPort()
 {
     serial->close();
-    // ui->statusbar->showMessage("串口已关闭");
+    statusBar()->showMessage("串口已关闭");  // 统一使用 statusBar()
 }
 
 // 读取 STM32 发送的应变数据
 void MainWindow::readSerialData()
 {
     QByteArray data = serial->readAll();
-    QString strData = QString::fromUtf8(data).trimmed();  // 转换为字符串
+    QString strData = QString::fromUtf8(data).trimmed();
 
-    // 解析数据格式: "ADC=xxx  VOL=xx.xx  STRAIN=xx.xx"
-    QStringList list = strData.split(" ");
-    if (list.size() >= 6) {
-        double strain = list[5].toDouble();
+    // 使用正则表达式匹配数据格式
+    QRegularExpression regex("STRAIN=([+-]?\\d+\\.?\\d*)");
+    QRegularExpressionMatch match = regex.match(strData);
 
-        // 记录最值
-        if (strain < minStrain) minStrain = strain;
-        if (strain > maxStrain) maxStrain = strain;
+    if (match.hasMatch()) {
+        bool ok;
+        double strain = match.captured(1).toDouble(&ok);
+
+        if (!ok) {
+            qDebug() << "数据转换失败：" << strData;
+            return;
+        }
+
+        // 更新最值（需在类声明中初始化 minStrain 和 maxStrain）
+        minStrain = qMin(minStrain, strain);
+        maxStrain = qMax(maxStrain, strain);
 
         // 显示最值
         ui->labelMin->setText(QString("Min: %1").arg(minStrain, 0, 'f', 6));
         ui->labelMax->setText(QString("Max: %1").arg(maxStrain, 0, 'f', 6));
 
         // 绘制数据
-        strainData.append(strain);
-        series->append(strainData.size(), strain);
+        static qint64 startTime = QDateTime::currentMSecsSinceEpoch();
+        qreal time = (QDateTime::currentMSecsSinceEpoch() - startTime) / 1000.0;
 
-        // 让 X 轴滚动
-        if (strainData.size() > 1000) {
-            strainData.removeFirst();
-            axisX->setRange(strainData.size() - 1000, strainData.size());
+        series->append(time, strain);
+
+        // 动态调整 X 轴范围（显示最近 60 秒数据）
+        if (time > 60) {
+            axisX->setRange(time - 60, time);
+        } else {
+            axisX->setRange(0, 60);
         }
 
-        // 更新 Y 轴范围
-        double minY = *std::min_element(strainData.begin(), strainData.end());
-        double maxY = *std::max_element(strainData.begin(), strainData.end());
-        axisY->setRange(minY, maxY);
+        // 自动缩放 Y 轴
+        chart->axisY ()->setRange(minStrain - 0.0001, maxStrain + 0.0001);
+    } else {
+        qDebug() << "无效数据格式：" << strData;
     }
 }
 
