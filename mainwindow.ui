@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1302</width>
+    <height>637</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -23,8 +23,8 @@
    <widget class="QPushButton" name="btnOpen">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>70</y>
+      <x>50</x>
+      <y>100</y>
       <width>80</width>
       <height>23</height>
      </rect>
@@ -36,8 +36,8 @@
    <widget class="QPushButton" name="btnClose">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>110</y>
+      <x>50</x>
+      <y>140</y>
       <width>80</width>
       <height>23</height>
      </rect>
@@ -49,8 +49,8 @@
    <widget class="QPushButton" name="btnClear">
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>510</y>
+      <x>50</x>
+      <y>560</y>
       <width>80</width>
       <height>23</height>
      </rect>
@@ -62,7 +62,7 @@
    <widget class="QComboBox" name="comboBoxPort">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>10</x>
       <y>260</y>
       <width>72</width>
       <height>23</height>
@@ -72,7 +72,7 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>20</x>
       <y>230</y>
       <width>51</width>
       <height>21</height>
@@ -82,22 +82,22 @@
      <string>选择端口</string>
     </property>
    </widget>
-   <widget class="QChartView" name="chartView" native="true">
+   <widget class="QChartView" name="chartViewCH1" native="true">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>70</y>
-      <width>431</width>
-      <height>281</height>
+      <x>240</x>
+      <y>30</y>
+      <width>401</width>
+      <height>251</height>
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="labelMin">
+   <widget class="QLabel" name="labelCH2Max">
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>450</y>
-      <width>81</width>
+      <x>780</x>
+      <y>10</y>
+      <width>101</width>
       <height>16</height>
      </rect>
     </property>
@@ -105,12 +105,12 @@
      <string>TextLabel</string>
     </property>
    </widget>
-   <widget class="QLabel" name="labelMax">
+   <widget class="QLabel" name="labelCH1Max">
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>470</y>
-      <width>81</width>
+      <x>280</x>
+      <y>10</y>
+      <width>111</width>
       <height>16</height>
      </rect>
     </property>
@@ -121,8 +121,8 @@
    <widget class="QPushButton" name="btnRefresh">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>190</y>
+      <x>50</x>
+      <y>180</y>
       <width>71</width>
       <height>31</height>
      </rect>
@@ -131,13 +131,157 @@
      <string>刷新串口</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>230</y>
+      <width>61</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>选择波特率</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBoxBaud">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>260</y>
+      <width>72</width>
+      <height>23</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QChartView" name="chartViewCH2" native="true">
+    <property name="geometry">
+     <rect>
+      <x>730</x>
+      <y>30</y>
+      <width>401</width>
+      <height>251</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QChartView" name="chartViewCH3" native="true">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>310</y>
+      <width>401</width>
+      <height>251</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QChartView" name="chartViewCH4" native="true">
+    <property name="geometry">
+     <rect>
+      <x>730</x>
+      <y>310</y>
+      <width>401</width>
+      <height>251</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>10</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>CH1</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>730</x>
+      <y>10</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>CH2</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>570</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>CH3</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>730</x>
+      <y>570</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>CH4</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelCH3Max">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>570</y>
+      <width>101</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelCH4Max">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>570</y>
+      <width>101</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_7">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>VTE应变测试</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>1302</width>
      <height>20</height>
     </rect>
    </property>

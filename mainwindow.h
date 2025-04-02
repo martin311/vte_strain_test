@@ -8,6 +8,8 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
+#include <QVector>
+#include <QRegularExpression>
 
 
 QT_BEGIN_NAMESPACE
@@ -16,6 +18,8 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
+// 定义通道数，4个通道
+static const int CHANNEL_COUNT = 4;
 
 class MainWindow : public QMainWindow
 {
@@ -30,20 +34,33 @@ private slots:
     void closeSerialPort(); // 关闭串口
     void readSerialData();  // 读取串口数据
     void clearData();       // 清除数据
-
+    void updateBaudRate();
 
 private:
     Ui::MainWindow *ui;
     QSerialPort *serial;    // 串口
+    QVector<double> maxStrain;
+    QVector<double> minStrain;
+
     QSerialPort::BaudRate currentBaudRate;
     QSerialPort::DataBits currentDataBits;
     QSerialPort::Parity currentParity;
     QSerialPort::StopBits currentStopBits;
-    QLineSeries *series;    // 数据曲线
-    QChart *chart;          // 图表
-    QValueAxis *axisX;      // X轴
-    QValueAxis *axisY;      // Y轴
-    QVector<double> strainData; // 存储应变数据
-    double minStrain = 1e9, maxStrain = -1e9; // 记录最小、最大值
+
+    // 对于4个通道，每个通道有一个 QLineSeries 和一个 QChart（这里每个图表都显示一条曲线）
+    QLineSeries* series[CHANNEL_COUNT];
+    QChart* chart[CHANNEL_COUNT];
+    QValueAxis* axisX[CHANNEL_COUNT];
+    QValueAxis* axisY[CHANNEL_COUNT];
+
+    // 存储每个通道的采集数据（用于可选的进一步处理，这里主要用于曲线显示）
+    QVector<QVector<double>> strainData; // strainData[i] 存储第 i 个通道的数据
+
+    // 记录每个通道的最值（输出绝对值最大的值，无论正负）
+    double absMax[CHANNEL_COUNT]; // 初始化时设为 0
+
+    // 辅助函数：解析一行串口数据，更新对应通道数据和图表
+    void parseStrainLine(const QString &line);
+
 };
 #endif // MAINWINDOW_H
