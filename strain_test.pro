@@ -2,6 +2,9 @@ QT       += core gui serialport charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+# 添加 QXlsx 目录
+include($$PWD/QXlsx/QXlsx.pri)
+
 CONFIG += c++17
 
 # You can make your code fail to compile if it uses deprecated APIs.

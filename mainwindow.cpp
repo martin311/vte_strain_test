@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , serial(new QSerialPort(this))
     , maxStrain(4, -1e9)
-    , minStrain(4, -1e9)
+    , minStrain(4, 1e9)
     // , statusbar()
 {
     ui->setupUi(this);
@@ -71,8 +71,8 @@ MainWindow::MainWindow(QWidget *parent)
 
         // Y轴设置：应变值，初始范围可根据实际情况调整
         axisY[i]->setTitleText("Strain");
-        axisY[i]->setLabelFormat("%.6f");
-        axisY[i]->setRange(-0.003, 0.003);
+        axisY[i]->setLabelFormat("%.2f");
+        axisY[i]->setRange(-20000, 20000);
         chart[i]->addAxis(axisY[i], Qt::AlignLeft);
         series[i]->attachAxis(axisY[i]);
     }
@@ -165,9 +165,11 @@ void MainWindow::readSerialData()
     QByteArray data = serial->readAll();
     QString strData = QString::fromUtf8(data).trimmed();
 
+    qDebug() << "[串口接收]：" << strData;
+
     // 使用正则表达式匹配数据格式
-    QRegularExpression regex("STRAIN=([+-]?\\d+\\.?\\d*)");
-    QRegularExpressionMatch match = regex.match(strData);
+    // QRegularExpression regex("CH(\\d+):\\s*([+-]?\\d+\\.?\\d*)\\s*µε");
+    // QRegularExpressionMatch match = regex.match(strData);
 
     // 假设每一行数据以换行符结束
     static QByteArray buffer;
@@ -187,7 +189,7 @@ void MainWindow::parseStrainLine(const QString &line)
 {
      // 用正则表达式提取通道数据
      // 正则：匹配 "CH" 后面跟一个或多个数字，后面是冒号，再匹配一个浮点数（带可能的正负号）
-    QRegularExpression regex("CH(\\d+):\\s*([-+]?[0-9]*\\.?[0-9]+)");
+    QRegularExpression regex("CH(\\d+):\\s*([+-]?\\d+\\.?\\d*)");
     QRegularExpressionMatchIterator it = regex.globalMatch(line);
     // 获取当前时间（秒），作为X轴数据
     static qint64 startTime = QDateTime::currentMSecsSinceEpoch();
@@ -207,25 +209,24 @@ void MainWindow::parseStrainLine(const QString &line)
             series[idx]->append(time, strain);
 
             // 更新最值：取绝对值最大的值
-            if (qAbs(strain) > qMax(qAbs(minStrain[idx]), qAbs(maxStrain[idx]))) {
-                if (strain > 0)
-                    maxStrain[idx] = strain;
-                else
-                    minStrain[idx] = strain;
+            if (qAbs(strain) > qAbs(maxStrain[idx])) {
+                maxStrain[idx] = strain; // 直接更新最大绝对值对应的值
             }
 
             // 更新 UI 标签（假设标签名称为 labelCH1Max, labelCH2Max, …）
-            switch (idx) {
-            case 0: ui->labelCH1Max->setText(QString("Max: %1").arg(qMax(qAbs(minStrain[0]), qAbs(maxStrain[0])), 0, 'f', 6)); break;
-            case 1: ui->labelCH2Max->setText(QString("Max: %1").arg(qMax(qAbs(minStrain[1]), qAbs(maxStrain[1])), 0, 'f', 6)); break;
-            case 2: ui->labelCH3Max->setText(QString("Max: %1").arg(qMax(qAbs(minStrain[2]), qAbs(maxStrain[2])), 0, 'f', 6)); break;
-            case 3: ui->labelCH4Max->setText(QString("Max: %1").arg(qMax(qAbs(minStrain[3]), qAbs(maxStrain[3])), 0, 'f', 6)); break;
-            default: break;
-            }
+            QLabel* labels[] = {ui->labelCH1Max, ui->labelCH2Max, ui->labelCH3Max, ui->labelCH4Max};
+            labels[idx]->setText(QString("Max: %1 µε").arg(qAbs(maxStrain[idx]), 0, 'f', 2));
+            // switch (idx) {
+            // case 0: ui->labelCH1Max->setText(QString("Max: %1 µε").arg(qMax(qAbs(minStrain[0]), qAbs(maxStrain[0])), 0, 'f', 2)); break;
+            // case 1: ui->labelCH2Max->setText(QString("Max: %1").arg(qMax(qAbs(minStrain[1]), qAbs(maxStrain[1])), 0, 'f', 2)); break;
+            // case 2: ui->labelCH3Max->setText(QString("Max: %1 µε").arg(qMax(qAbs(minStrain[2]), qAbs(maxStrain[2])), 0, 'f', 2)); break;
+            // case 3: ui->labelCH4Max->setText(QString("Max: %1").arg(qMax(qAbs(minStrain[3]), qAbs(maxStrain[3])), 0, 'f', 2)); break;
+            // default: break;
+            // }
 
             // 调整 X 轴范围，保持显示最近 60 秒
-            if (time > 60)
-                axisX[idx]->setRange(time - 60, time);
+            if (time > 120)
+                axisX[idx]->setRange(time - 120, time);
         }
     }
 }
@@ -241,9 +242,9 @@ void MainWindow::clearData()
         //maxStrain[i] = -1e9;
     }
     // 同时更新 UI 标签
-    ui->labelCH1Max->setText("Max: -");
-    ui->labelCH2Max->setText("Max: -");
-    ui->labelCH3Max->setText("Max: -");
-    ui->labelCH4Max->setText("Max: -");
+    ui->labelCH1Max->setText("Max: - µε");
+    ui->labelCH2Max->setText("Max: - µε");
+    ui->labelCH3Max->setText("Max: - µε");
+    ui->labelCH4Max->setText("Max: - µε");
 }
 
