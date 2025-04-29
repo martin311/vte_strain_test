@@ -10,7 +10,9 @@
 #include <QtCharts/QValueAxis>
 #include <QVector>
 #include <QRegularExpression>
-
+// #include "xlsxdocument.h"  // 添加 QtXlsx 头文件
+// #include "xlsxformat.h"    // 用于设置单元格格式
+// #include <QFileDialog>     // 让用户选择 Excel 保存路径
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

@@ -3,7 +3,11 @@ QT       += core gui serialport charts
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 # 添加 QXlsx 目录
+INCLUDEPATH += "D:/PROGRA~2/Qt/project/strain_test/strain_test/QXlsx"
+DEPENDPATH += "D:/PROGRA~2/Qt/project/strain_test/strain_test/QXlsx"
+
 include($$PWD/QXlsx/QXlsx.pri)
+
 
 CONFIG += c++17
 

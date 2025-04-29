@@ -65,7 +65,7 @@ MainWindow::MainWindow(QWidget *parent)
         // X轴设置：时间轴，范围显示最近60秒数据
         axisX[i]->setTitleText("Time (s)");
         axisX[i]->setLabelFormat("%.1f");
-        axisX[i]->setRange(0, 120);
+        axisX[i]->setRange(0, 240);
         chart[i]->addAxis(axisX[i], Qt::AlignBottom);
         series[i]->attachAxis(axisX[i]);
 
@@ -225,8 +225,8 @@ void MainWindow::parseStrainLine(const QString &line)
             // }
 
             // 调整 X 轴范围，保持显示最近 60 秒
-            if (time > 120)
-                axisX[idx]->setRange(time - 120, time);
+            if (time > 240)
+                axisX[idx]->setRange(time - 240, time);
         }
     }
 }
